@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>4P Trauma - Valoración rápida</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --c-fondo: #f4f7fb;
+      --c-card: #ffffff;
+      --c-borde: #d0d7e2;
+      --c-texto: #1f2933;
+      --c-texto-suave: #6b7280;
+
+      --c-pecho: #ffb3b8;
+      --c-panza: #ffe4a3;
+      --c-pelvis: #c9e4ff;
+      --c-pierna: #b6f2c2;
+
+      --c-critico: #ef4444;
+      --c-importante: #f59e0b;
+      --c-normal: #22c55e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: var(--c-fondo);
+      color: var(--c-texto);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 0.75rem;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 480px;
+      background: var(--c-fondo);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    header h1 {
+      font-size: 1.15rem;
+      margin-bottom: 0.15rem;
+    }
+
+    header p {
+      font-size: 0.85rem;
+      color: var(--c-texto-suave);
+    }
+
+    .pills {
+      margin-top: 0.4rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.3rem;
+    }
+
+    .pill {
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #64748b;
+      font-size: 0.7rem;
+    }
+
+    .card {
+      background: var(--c-card);
+      border-radius: 1rem;
+      padding: 0.75rem;
+      border: 1px solid var(--c-borde);
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.06);
+      margin-top: 0.6rem;
+    }
+
+    .card h2 {
+      font-size: 0.95rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .card-sub {
+      font-size: 0.8rem;
+      color: var(--c-texto-suave);
+      margin-bottom: 0.5rem;
+    }
+
+    .figura {
+      width: 100%;
+      border-radius: 0.8rem;
+      border: 1px dashed #cbd5e1;
+      background: linear-gradient(135deg, #e5f0ff, #fef9c3);
+      height: 160px;
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: #1f2933;
+      font-size: 0.8rem;
+      text-align: center;
+      padding: 0.5rem;
+    }
+
+    .figura span.emoji {
+      font-size: 2.4rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.4rem;
+    }
+
+    .tab-btn {
+      border-radius: 0.9rem;
+      border: 2px solid transparent;
+      padding: 0.55rem 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      background: #e5ecf7;
+      color: #111827;
+      transition: transform 0.08s, box-shadow 0.1s, border-color 0.1s, background 0.1s;
+    }
+
+    .tab-btn span.icon {
+      font-size: 1.3rem;
+    }
+
+    .tab-btn.pecho { background: var(--c-pecho); }
+    .tab-btn.panza { background: var(--c-panza); }
+    .tab-btn.pelvis { background: var(--c-pelvis); }
+    .tab-btn.pierna { background: var(--c-pierna); }
+
+    .tab-btn.active {
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+      transform: translateY(-1px);
+      border-color: #0f766e;
+    }
+
+    .tab-btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .zona-titulo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.6rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .zona-titulo h3 {
+      font-size: 0.9rem;
+    }
+
+    .badge-zona {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e3a8a;
+    }
+
+    .mini-pasos {
+      display: flex;
+      gap: 0.3rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.7rem;
+      color: var(--c-texto-suave);
+      flex-wrap: wrap;
+    }
+
+    .mini-paso {
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #4f46e5;
+    }
+
+    .opciones-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+    }
+
+    .opcion {
+      position: relative;
+      border-radius: 0.8rem;
+      padding: 0.4rem 0.5rem 0.4rem 2.1rem;
+      border: 1px solid #e2e8f0;
+      background: #f9fafb;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      font-size: 0.8rem;
+      transition: border-color 0.12s, background 0.12s, transform 0.06s;
+    }
+
+    .opcion input {
+      position: absolute;
+      left: 0.6rem;
+      top: 0.7rem;
+      transform: scale(1.1);
+      accent-color: #16a34a;
+    }
+
+    .opcion strong {
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .chip-estado {
+      padding: 0.05rem 0.45rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      border: 1px solid transparent;
+    }
+
+    .chip-estado.normal {
+      background: #e7fbe9;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+
+    .chip-estado.importante {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #fde68a;
+    }
+
+    .chip-estado.critico {
+      background: #fee2e2;
+      color: #b91c1c;
+      border-color: #fecaca;
+    }
+
+    .opcion span.desc {
+      color: #6b7280;
+      font-size: 0.75rem;
+    }
+
+    .opcion.seleccionada {
+      border-color: #0ea5e9;
+      background: #e0f2fe;
+      transform: translateY(-1px);
+    }
+
+    .zona-estado {
+      margin-top: 0.45rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .badge-estado {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #475569;
+      font-size: 0.75rem;
+    }
+
+    .badge-estado span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #94a3b8;
+    }
+
+    .badge-estado.critico {
+      border-color: #fecaca;
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .badge-estado.critico span.dot {
+      background: var(--c-critico);
+    }
+
+    .badge-estado.ok {
+      border-color: #bbf7d0;
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-estado.ok span.dot {
+      background: var(--c-normal);
+    }
+
+    .acciones {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .acciones button {
+      flex: 1;
+      padding: 0.4rem 0.5rem;
+      font-size: 0.78rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+      transition: transform 0.06s, box-shadow 0.08s, background 0.1s;
+    }
+
+    .btn-claro {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .btn-color {
+      background: #0ea5e9;
+      color: #f9fafb;
+      box-shadow: 0 3px 8px rgba(14, 165, 233, 0.4);
+    }
+
+    .resumen-mini {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.25rem;
+      margin-top: 0.4rem;
+      font-size: 0.72rem;
+    }
+
+    .resumen-mini-item {
+      border-radius: 0.7rem;
+      padding: 0.2rem 0.35rem;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+      background: #f9fafb;
+    }
+
+    .resumen-mini-item strong {
+      display: block;
+      margin-bottom: 0.1rem;
+      font-size: 0.75rem;
+    }
+
+    .resumen-mini-item span.estado {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+
+    .resumen-mini-item span.circulo {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #e5e7eb;
+    }
+
+    .resumen-mini-item.ok span.circulo {
+      background: var(--c-normal);
+    }
+
+    .resumen-mini-item.riesgo span.circulo {
+      background: var(--c-importante);
+    }
+
+    .resumen-mini-item.critico span.circulo {
+      background: var(--c-critico);
+    }
+
+    .lista-card {
+      margin-top: 0.5rem;
+    }
+
+    .resumen-lista {
+      margin-top: 0.3rem;
+      max-height: 160px;
+      overflow-y: auto;
+      padding-right: 0.1rem;
+    }
+
+    .resumen-item {
+      border-radius: 0.7rem;
+      border: 1px solid #e2e8f0;
+      background: #f9fafb;
+      padding: 0.35rem 0.45rem;
+      margin-bottom: 0.25rem;
+      font-size: 0.78rem;
+    }
+
+    .resumen-item strong {
+      font-size: 0.8rem;
+    }
+
+    .resumen-item span.tipo {
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+
+    .resumen-vacio {
+      font-size: 0.78rem;
+      color: #9ca3af;
+    }
+
+    .alerta-global {
+      margin-top: 0.4rem;
+      border-radius: 0.7rem;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      font-size: 0.77rem;
+      padding: 0.35rem 0.45rem;
+      display: flex;
+      gap: 0.3rem;
+      align-items: center;
+    }
+
+    .alerta-global.critico {
+      border-color: #fecaca;
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .alerta-emoji {
+      font-size: 1rem;
+    }
+
+    footer {
+      margin-top: 0.4rem;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+
+    @media (min-width: 768px) {
+      .app {
+        max-width: 720px;
+      }
+
+      .doble-col {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 0.75rem;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>4P trauma · Valoración rápida</h1>
+      <p>Marca lo que encuentres en cada zona.</p>
+      <div class="pills">
+        <span class="pill">Pecho</span>
+        <span class="pill">Panza</span>
+        <span class="pill">Pelvis</span>
+        <span class="pill">Pierna</span>
+      </div>
+    </header>
+
+    <!-- Audios -->
+    <audio id="audio-click" src="click.wav" preload="auto"></audio>
+    <audio id="audio-ok" src="ok.wav" preload="auto"></audio>
+    <audio id="audio-alert" src="alert.wav" preload="auto"></audio>
+
+    <div class="doble-col">
+      <section class="card">
+        <h2>Explora la zona</h2>
+        <p class="card-sub">Elige la P y marca los hallazgos.</p>
+
+        <div class="figura">
+          <span class="emoji">🧍‍♂️</span>
+          <div>Imagina al paciente frente a ti.</div>
+          <div style="font-size:0.7rem; color:#4b5563; margin-top:0.1rem;">
+            Pecho · Panza · Pelvis · Piernas
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab-btn pecho active" data-zona="pecho">
+            <span class="icon">❤️</span> Pecho
+          </button>
+          <button class="tab-btn panza" data-zona="panza">
+            <span class="icon">🟡</span> Panza
+          </button>
+          <button class="tab-btn pelvis" data-zona="pelvis">
+            <span class="icon">🟦</span> Pelvis
+          </button>
+          <button class="tab-btn pierna" data-zona="pierna">
+            <span class="icon">🦵</span> Pierna
+          </button>
+        </div>
+
+        <div id="zona-contenido"></div>
+
+        <div class="zona-estado">
+          <div class="badge-estado" id="estado-zona">
+            <span class="dot"></span>
+            Zona sin datos
+          </div>
+          <div class="acciones">
+            <button class="btn-claro" id="btn-limpiar-zona">Borrar</button>
+            <button class="btn-color" id="btn-ver-resumen">Resumen</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Semáforo 4P</h2>
+        <p class="card-sub">Verde: tranquilo · Rojo: grave.</p>
+
+        <div class="resumen-mini" id="resumen-mini"></div>
+
+        <div class="card lista-card">
+          <h2>Detalle</h2>
+          <div class="resumen-lista" id="resumen-lista">
+            <p class="resumen-vacio">
+              Marca opciones en cada P y aquí verás un resumen.
+            </p>
+          </div>
+        </div>
+
+        <div class="alerta-global" id="alerta-global">
+          <span class="alerta-emoji">ℹ️</span>
+          <span>Usa el semáforo para decidir si el paciente está estable o si hay señales de gravedad.</span>
+        </div>
+
+        <footer>
+          Recuerda: primero ABC y hemorragias. Las 4P son valoración secundaria.
+        </footer>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const ZONAS = {
+      pecho: {
+        nombre: "Pecho",
+        opciones: [
+          { id: "pecho_normal", etiqueta: "Tórax normal", tipo: "normal", desc: "Respira igual por ambos lados." },
+          { id: "pecho_dolor", etiqueta: "Dolor costal", tipo: "importante", desc: "Le duele al palpar costillas." },
+          { id: "pecho_asim", etiqueta: "Respiración asimétrica", tipo: "critico", desc: "Un lado se mueve menos." },
+          { id: "pecho_herida", etiqueta: "Herida en pecho", tipo: "critico", desc: "Herida que puede afectar la respiración." }
+        ]
+      },
+      panza: {
+        nombre: "Panza",
+        opciones: [
+          { id: "panza_normal", etiqueta: "Abdomen blando", tipo: "normal", desc: "No duele, no está duro." },
+          { id: "panza_dolor", etiqueta: "Dolor moderado", tipo: "importante", desc: "Molestia al tocar." },
+          { id: "panza_defensa", etiqueta: "Defensa / rigidez", tipo: "critico", desc: "Endurece el abdomen o mucho dolor." },
+          { id: "panza_hematoma", etiqueta: "Hematoma / cinturón", tipo: "importante", desc: "Moretones o marca de cinturón." }
+        ]
+      },
+      pelvis: {
+        nombre: "Pelvis",
+        opciones: [
+          { id: "pelvis_normal", etiqueta: "Pelvis estable", tipo: "normal", desc: "No duele ni se ve deformada." },
+          { id: "pelvis_dolor", etiqueta: "Dolor a la compresión", tipo: "critico", desc: "Le duele al comprimir suavemente." },
+          { id: "pelvis_inestable", etiqueta: "Pelvis inestable", tipo: "critico", desc: "Se nota movimiento anormal." },
+          { id: "pelvis_hematoma", etiqueta: "Hematoma perineal", tipo: "critico", desc: "Moretones en la zona genital o perineal." }
+        ]
+      },
+      pierna: {
+        nombre: "Pierna",
+        opciones: [
+          { id: "pierna_normal", etiqueta: "Sin deformidad", tipo: "normal", desc: "Piernas alineadas, buen color." },
+          { id: "pierna_deform", etiqueta: "Deformidad", tipo: "importante", desc: "Se ve torcida o acortada." },
+          { id: "pierna_abierta", etiqueta: "Fractura abierta", tipo: "critico", desc: "Se ve hueso o herida profunda." },
+          { id: "pierna_pulsos", etiqueta: "Pulsos débiles", tipo: "critico", desc: "No se siente bien el pulso en el pie." }
+        ]
+      }
+    };
+
+    const estado = {
+      pecho: new Set(),
+      panza: new Set(),
+      pelvis: new Set(),
+      pierna: new Set()
+    };
+
+    let zonaActual = "pecho";
+
+    const zonaContenido = document.getElementById("zona-contenido");
+    const estadoZona = document.getElementById("estado-zona");
+    const resumenMini = document.getElementById("resumen-mini");
+    const resumenLista = document.getElementById("resumen-lista");
+    const alertaGlobal = document.getElementById("alerta-global");
+
+    const audioClick = document.getElementById("audio-click");
+    const audioOk = document.getElementById("audio-ok");
+    const audioAlert = document.getElementById("audio-alert");
+
+    function playSound(sound) {
+      if (!sound) return;
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    }
+
+    function renderZona(zonaKey) {
+      zonaActual = zonaKey;
+      const zona = ZONAS[zonaKey];
+
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.zona === zonaKey);
+      });
+
+      zonaContenido.innerHTML = `
+        <div class="zona-titulo">
+          <h3>${zona.nombre}</h3>
+          <span class="badge-zona">${zona.nombre} · 4P</span>
+        </div>
+        <div class="mini-pasos">
+          <span class="mini-paso">👁️ Mirar</span>
+          <span class="mini-paso">✋ Tocar</span>
+          <span class="mini-paso">❓ Preguntar</span>
+        </div>
+        <div class="opciones-grid">
+          ${zona.opciones
+            .map((op) => {
+              const checked = estado[zonaKey].has(op.id) ? "checked" : "";
+              const chipClass =
+                op.tipo === "critico"
+                  ? "critico"
+                  : op.tipo === "importante"
+                  ? "importante"
+                  : "normal";
+              const seleccionada = checked ? "seleccionada" : "";
+              return `
+                <label class="opcion ${seleccionada}">
+                  <input type="checkbox" data-id="${op.id}" ${checked} />
+                  <strong>
+                    ${op.etiqueta}
+                    <span class="chip-estado ${chipClass}">
+                      ${
+                        op.tipo === "critico"
+                          ? "Rojo"
+                          : op.tipo === "importante"
+                          ? "Ámbar"
+                          : "Verde"
+                      }
+                    </span>
+                  </strong>
+                  <span class="desc">${op.desc}</span>
+                </label>
+              `;
+            })
+            .join("")}
+        </div>
+      `;
+
+      zonaContenido
+        .querySelectorAll("input[type='checkbox']")
+        .forEach((input) => {
+          input.addEventListener("change", () => {
+            const id = input.dataset.id;
+            playSound(audioClick);
+            if (input.checked) {
+              estado[zonaKey].add(id);
+            } else {
+              estado[zonaKey].delete(id);
+            }
+            const label = input.closest(".opcion");
+            label.classList.toggle("seleccionada", input.checked);
+            actualizarEstadoZona();
+          });
+        });
+
+      actualizarEstadoZona();
+    }
+
+    function zonaTieneCritico(zonaKey) {
+      const zona = ZONAS[zonaKey];
+      const seleccionados = estado[zonaKey];
+      return zona.opciones.some(
+        (op) => seleccionados.has(op.id) && op.tipo === "critico"
+      );
+    }
+
+    function zonaTieneImportante(zonaKey) {
+      const zona = ZONAS[zonaKey];
+      const seleccionados = estado[zonaKey];
+      return zona.opciones.some(
+        (op) => seleccionados.has(op.id) && op.tipo === "importante"
+      );
+    }
+
+    function zonaTieneAlgo(zonaKey) {
+      return estado[zonaKey].size > 0;
+    }
+
+    function actualizarEstadoZona() {
+      const tieneCritico = zonaTieneCritico(zonaActual);
+      const tieneImportante = zonaTieneImportante(zonaActual);
+      const tieneAlgo = zonaTieneAlgo(zonaActual);
+
+      estadoZona.classList.remove("critico", "ok");
+      if (!tieneAlgo) {
+        estadoZona.querySelector(".dot").style.background = "#94a3b8";
+        estadoZona.lastChild.textContent = " Zona sin datos";
+        return;
+      }
+
+      if (tieneCritico) {
+        estadoZona.classList.add("critico");
+        estadoZona.lastChild.textContent = " Hallazgo rojo en esta zona";
+      } else {
+        estadoZona.classList.add("ok");
+        if (tieneImportante) {
+          estadoZona.lastChild.textContent = " Hallazgos de riesgo (ámbar)";
+        } else {
+          estadoZona.lastChild.textContent = " Hallazgos verdes solamente";
+        }
+      }
+    }
+
+    function calcularEstadoZonaMini(zonaKey) {
+      if (zonaTieneCritico(zonaKey)) return "critico";
+      if (zonaTieneImportante(zonaKey)) return "riesgo";
+      if (zonaTieneAlgo(zonaKey)) return "ok";
+      return "vacio";
+    }
+
+    function renderMiniResumen() {
+      const zonas = ["pecho", "panza", "pelvis", "pierna"];
+      resumenMini.innerHTML = zonas
+        .map((z) => {
+          const estadoZ = calcularEstadoZonaMini(z);
+          let texto = "Sin datos";
+          if (estadoZ === "ok") texto = "Verde";
+          if (estadoZ === "riesgo") texto = "Ámbar";
+          if (estadoZ === "critico") texto = "Rojo";
+
+          const claseExtra =
+            estadoZ === "ok"
+              ? "ok"
+              : estadoZ === "riesgo"
+              ? "riesgo"
+              : estadoZ === "critico"
+              ? "critico"
+              : "";
+
+          return `
+            <div class="resumen-mini-item ${claseExtra}">
+              <strong>${ZONAS[z].nombre.split(" ")[0]}</strong>
+              <span class="estado">
+                <span class="circulo"></span>
+                ${texto}
+              </span>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function construirResumenDetallado() {
+      const items = [];
+      Object.keys(ZONAS).forEach((zonaKey) => {
+        const zona = ZONAS[zonaKey];
+        const seleccionados = estado[zonaKey];
+        zona.opciones.forEach((op) => {
+          if (seleccionados.has(op.id)) {
+            items.push({
+              zona: zona.nombre,
+              etiqueta: op.etiqueta,
+              tipo: op.tipo,
+              desc: op.desc
+            });
+          }
+        });
+      });
+      return items;
+    }
+
+    function renderResumenDetallado() {
+      const items = construirResumenDetallado();
+      if (items.length === 0) {
+        resumenLista.innerHTML =
+          '<p class="resumen-vacio">Sin marcas aún. Explora las 4P y el resumen aparecerá aquí.</p>';
+        alertaGlobal.classList.remove("critico");
+        alertaGlobal.innerHTML =
+          '<span class="alerta-emoji">ℹ️</span><span>Usa el semáforo para decidir si el paciente está estable o si hay señales de gravedad.</span>';
+        renderMiniResumen();
+        return;
+      }
+
+      resumenLista.innerHTML = items
+        .map((item) => {
+          let tipoTexto =
+            item.tipo === "critico"
+              ? "Rojo · Hallazgo crítico"
+              : item.tipo === "importante"
+              ? "Ámbar · Hallazgo de riesgo"
+              : "Verde · Hallazgo sin riesgo grave";
+          return `
+            <div class="resumen-item">
+              <strong>${item.zona}: ${item.etiqueta}</strong><br/>
+              <span class="tipo">${tipoTexto}</span><br/>
+              <span>${item.desc}</span>
+            </div>
+          `;
+        })
+        .join("");
+
+      const hayCritico = items.some((i) => i.tipo === "critico");
+      if (hayCritico) {
+        alertaGlobal.classList.add("critico");
+        alertaGlobal.innerHTML =
+          '<span class="alerta-emoji">🚨</span><span>Hay hallazgos rojos. Imagina que eres el equipo: ¿qué harías ahora?</span>';
+        playSound(audioAlert);
+      } else {
+        alertaGlobal.classList.remove("critico");
+        alertaGlobal.innerHTML =
+          '<span class="alerta-emoji">✅</span><span>No hay hallazgos rojos. Sigue vigilando y piensa qué podría hacerlo empeorar.</span>';
+        playSound(audioOk);
+      }
+
+      renderMiniResumen();
+    }
+
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        renderZona(btn.dataset.zona);
+      });
+    });
+
+    document.getElementById("btn-limpiar-zona").addEventListener("click", () => {
+      estado[zonaActual].clear();
+      renderZona(zonaActual);
+      renderResumenDetallado();
+    });
+
+    document.getElementById("btn-ver-resumen").addEventListener("click", () => {
+      renderResumenDetallado();
+      if (window.innerWidth < 768) {
+        document
+          .querySelectorAll(".card")[1]
+          .scrollIntoView({ behavior: "smooth" });
+      }
+    });
+
+    renderZona("pecho");
+    renderMiniResumen();
+  </script>
+</body>
+</html>
